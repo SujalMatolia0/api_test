@@ -37,6 +37,7 @@ export default class AuthController {
       data: {
         type: 'bearer',
         value: token.value!.release(),
+        messages: 'Logged in',
       },
     })
   }

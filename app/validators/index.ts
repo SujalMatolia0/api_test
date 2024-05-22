@@ -9,9 +9,11 @@ export const userPasswordSchema = vine
   .minLength(6)
   .maxLength(20)
   .regex(/[a-z A-Z 0-9]/)
-
 export const userFullNameSchema = vine.string().minLength(6).maxLength(50)
 
 export const folderNameSchema = vine.string().minLength(6).maxLength(20)
+export const folderPathSchema = vine.string()
 
 export const fileNameSchema = vine.string().minLength(6).maxLength(20)
+export const fileDataSchema = vine.string()
+export const fileSizeSchema = vine.number()

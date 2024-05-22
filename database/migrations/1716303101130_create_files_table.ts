@@ -8,6 +8,8 @@ export default class extends BaseSchema {
       table.increments('id')
       table.integer('folder_id').unsigned().references('folders.id').onDelete('CASCADE')
       table.string('name')
+      table.string('data')
+      table.integer('size')
 
       table.timestamp('created_at')
       table.timestamp('updated_at')

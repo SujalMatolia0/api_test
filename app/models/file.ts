@@ -8,6 +8,12 @@ export default class File extends BaseModel {
   @column()
   declare name: string
 
+  @column()
+  declare size: number
+
+  @column()
+  declare data?: string
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
