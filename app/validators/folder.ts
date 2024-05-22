@@ -4,13 +4,22 @@ import {
   fileNameSchema,
   fileSizeSchema,
   folderNameSchema,
-  folderPathSchema,
+  pageSchema,
+  perPageSchema,
 } from './index.js'
 
 export const folderValidator = vine.compile(
   vine.object({
     name: folderNameSchema,
-    path: folderPathSchema,
+  })
+)
+
+export const folderListValidator = vine.compile(
+  vine.object({
+    params: vine.object({
+      page: pageSchema,
+      perPage: perPageSchema,
+    }),
   })
 )
 
