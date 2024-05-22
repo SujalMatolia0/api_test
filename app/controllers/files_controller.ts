@@ -1,4 +1,9 @@
-import { fileValidator } from '#validators/folder'
+import {
+  fileDeleteValidator,
+  fileListValidator,
+  fileShowValidator,
+  fileValidator,
+} from '#validators/folder'
 import type { HttpContext } from '@adonisjs/core/http'
 import File from '#models/file'
 
@@ -7,69 +12,106 @@ export default class FilesController {
    * Display a list of resource
    */
   async index({ params, request, response }: HttpContext) {
-    const { folderId } = params
-    
-    response.ok({
-      data: {
-        files: files.name,
-      },
-    })
+    const payload = await request.validateUsing(fileListValidator)
+
+    const files = await File.query()
+      .where('folder_id', params.id)
+      .paginate(payload.params.page, payload.params.perPage)
+
+    return response.ok({ files })
   }
 
   /**
    * Display form to create a new record
    */
-  async create({ request, response }: HttpContext) {
-    const files = await request.validateUsing(fileValidator)
+  async create({ params, request, response }: HttpContext) {
+    const payload = await request.validateUsing(fileValidator)
 
-    const nameExists = await File.query().where('name', files.name)
+    const existingFile = await File.query().where('name', payload.name).select('id').first()
 
-    if (nameExists) {
-      return response.badRequest({
-        error: [{ fields: 'name', message: 'Name already exists' }],
+    if (existingFile) {
+      return response.conflict({
+        errors: [
+          {
+            message: 'File with the same name already exists',
+            field: 'name',
+          },
+        ],
       })
     }
 
-    const file = await File.create(files)
+    const file = await File.create({ folderId: params.id, name: payload.name, data: payload.data })
 
-    response.created({
-      data: {
-        type: 'bearer',
-        message: file.name + 'created',
-      },
-    })
+    return response.created({ data: { file } })
   }
-
-  /**
-   * Handle form submission for the create action
-   */
-  async store({ request }: HttpContext) {}
 
   /**
    * Show individual record
    */
-  async show({ params, response }: HttpContext) {
-    const file = await File.query().where('id', params.id).firstOrFail()
-    return response.json(file)
+  async show({ request, response }: HttpContext) {
+    const payload = await request.validateUsing(fileShowValidator)
+
+    const file = await File.query().where('name', payload.name && 'folderId', payload.folderId)
+
+    if (!file) {
+      return response.badRequest({
+        errors: [
+          {
+            message: 'File not found',
+            field: 'name',
+          },
+        ],
+      })
+    }
+
+    return response.ok({ file })
   }
 
   /**
-   * Edit individual record
+   * Handle form submission for the edit action
    */
-  async edit({ params, request, response }: HttpContext) {
-    const file = await File.query().where('id', params.id).firstOrFail()
-    const newFile = await request.validateUsing(fileValidator)
-    file.name = newFile.name
-    file.data = newFile.data
-    file.size = newFile.size
+  async update({ params, request, response }: HttpContext) {
+    const payload = await request.validateUsing(fileValidator)
+
+    const file = await File.query()
+      .where('id', params.id && 'folderId', payload.folderId)
+      .first()
+
+    if (!file) {
+      return response.badRequest({
+        errors: [
+          {
+            messages: 'folder not found',
+          },
+        ],
+      })
+    }
+
+    file.merge({
+      name: payload.name,
+      data: payload.data,
+    })
+
     await file.save()
+
+    return response.ok({ data: { file } })
   }
 
   /**
    * Delete record
    */
-  async destroy({ params }: HttpContext) {
-    const file = await File.findOrFail(params.id)
+  async destroy({ request, response }: HttpContext) {
+    const payload = await request.validateUsing(fileDeleteValidator)
+
+    const file = await File.query()
+      .where('name', payload.name && 'folderId', payload.folderId)
+      .first()
+
+    if (!file) {
+      return response.notFound({ message: 'file not found' })
+    }
     await file.delete()
+
+    return response.ok({ message: 'file deleted' })
   }
 }

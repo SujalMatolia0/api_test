@@ -14,9 +14,10 @@ export const userFullNameSchema = vine.string().minLength(6).maxLength(50)
 export const pageSchema = vine.number().range([1, 100000])
 export const perPageSchema = vine.number().range([1, 100])
 
-export const folderNameSchema = vine.string().minLength(6).maxLength(20)
+export const folderNameSchema = vine.string().minLength(1).maxLength(20)
 export const folderPathSchema = vine.string()
+
+export const folderIdSchema = vine.number().range([1, 1000])
 
 export const fileNameSchema = vine.string().minLength(6).maxLength(20)
 export const fileDataSchema = vine.string()
-export const fileSizeSchema = vine.number()

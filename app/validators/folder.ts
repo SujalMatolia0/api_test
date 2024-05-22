@@ -2,7 +2,7 @@ import vine from '@vinejs/vine'
 import {
   fileDataSchema,
   fileNameSchema,
-  fileSizeSchema,
+  folderIdSchema,
   folderNameSchema,
   pageSchema,
   perPageSchema,
@@ -23,10 +23,33 @@ export const folderListValidator = vine.compile(
   })
 )
 
+export const fileListValidator = vine.compile(
+  vine.object({
+    params: vine.object({
+      page: pageSchema,
+      perPage: perPageSchema,
+    }),
+  })
+)
+
+export const fileShowValidator = vine.compile(
+  vine.object({
+    name: fileNameSchema,
+    folderId: folderIdSchema,
+  })
+)
+
+export const fileDeleteValidator = vine.compile(
+  vine.object({
+    name: fileNameSchema,
+    folderId: folderIdSchema,
+  })
+)
+
 export const fileValidator = vine.compile(
   vine.object({
     name: fileNameSchema,
     data: fileDataSchema,
-    size: fileSizeSchema,
+    folderId: folderIdSchema,
   })
 )

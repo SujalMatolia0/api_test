@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import { type BelongsTo } from '@adonisjs/lucid/types/relations'
+import Folder from './folder.js'
 
 export default class File extends BaseModel {
   @column({ isPrimary: true })
@@ -9,7 +11,10 @@ export default class File extends BaseModel {
   declare name: string
 
   @column()
-  declare size: number
+  declare folderId: number
+
+  @belongsTo(() => Folder)
+  declare folder: BelongsTo<typeof Folder>
 
   @column()
   declare data?: string

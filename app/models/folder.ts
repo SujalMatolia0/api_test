@@ -11,7 +11,7 @@ export default class Folder extends BaseModel {
   declare name: string
 
   @column()
-  declare path: string
+  declare slug: string
 
   @hasMany(() => File)
   declare files: HasMany<typeof File>
