@@ -21,3 +21,8 @@ export const folderIdSchema = vine.number().range([1, 1000])
 
 export const fileNameSchema = vine.string().minLength(6).maxLength(20)
 export const fileDataSchema = vine.string()
+
+export const jobsNameSchema = vine.string().minLength(1).maxLength(20)
+export const jobsUrlSchema = vine.string().url()
+export const jobsScheduleSchema = vine.string().minLength(1).maxLength(20)
+export const jobsStatusSchema = vine.string().minLength(1).maxLength(20)

@@ -51,6 +51,12 @@ router
                   .prefix('file')
               })
               .prefix('folder')
+            router
+              .group(() => {
+                router.get('', '#controllers/jobs_controller.index')
+                router.post('', '#controllers/jobs_controller.create')
+              })
+              .prefix('jobs')
           })
           .prefix('app')
           .use(
