@@ -41,19 +41,21 @@ export default class JobsController {
       })
     }
 
-    const job = await Job.create(payload)
-
     cron.schedule(payload.schedule, () => {
       console.log('running')
       axios
         .get(payload.url)
         .then(() => {
           console.log('Request successful')
+          Job.query().where('name', job.name).update('success', job.status)
         })
         .catch((error) => {
           console.error('Request failed:', error.message)
+          Job.query().where('id', job.id).update({ status: 'failed' })
         })
     })
+
+    const job = await Job.create(payload)
 
     return response.created({ data: { job } })
   }
