@@ -6,9 +6,7 @@ import {
   jobsUpdateValidator,
 } from '#validators/job'
 import type { HttpContext } from '@adonisjs/core/http'
-
-import cron from 'node-cron'
-import axios from 'axios'
+import emitter from '@adonisjs/core/services/emitter'
 
 export default class JobsController {
   /**
@@ -41,21 +39,9 @@ export default class JobsController {
       })
     }
 
-    cron.schedule(payload.schedule, () => {
-      console.log('running')
-      axios
-        .get(payload.url)
-        .then(() => {
-          console.log('Request successful')
-          Job.query().where('name', job.name).update('success', job.status)
-        })
-        .catch((error) => {
-          console.error('Request failed:', error.message)
-          Job.query().where('id', job.id).update({ status: 'failed' })
-        })
-    })
-
     const job = await Job.create(payload)
+
+    emitter.emit('Job:Created', job)
 
     return response.created({ data: { job } })
   }
