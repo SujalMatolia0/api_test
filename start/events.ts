@@ -1,26 +1,25 @@
+import { agenda } from '#config/agenda'
 import emitter from '@adonisjs/core/services/emitter'
-import { Agenda } from 'agenda'
 import axios from 'axios'
+import { IJobParameters } from '@hokify/agenda'
+import Job from '#models/job'
+import logger from '@adonisjs/core/services/logger'
 
-const mongoConnectionString =
-  'mongodb+srv://matoliasujal:X02IrdpK6i6wdCws@cluster0.ptzajol.mongodb.net/'
-const agenda = new Agenda()
-agenda.database(mongoConnectionString)
+interface ScheduleJob extends IJobParameters {
+  job: Job
+}
 
-emitter.on('Job:Created', async (job: { url: string }) => {
-  console.log('hi 1')
+agenda.define<ScheduleJob>('schedule:job', async (job) => {
+  const { url } = job.attrs.data.job
 
-  await agenda.start()
+  try {
+    const res = await axios.get(url)
+    logger.info({ res: res.data }, 'Job executed successfully')
+  } catch (error) {
+    logger.error({ err: error }, 'Job execution failed')
+  }
+})
 
-  console.log('hi 2')
-
-  await agenda.on('1 minute', function () {
-    console.log('hi 3')
-    try {
-      axios.get(job.url)
-      console.log('success')
-    } catch (error) {
-      console.log('failed', error)
-    }
-  })
+emitter.on('job:created', async (job) => {
+  agenda.schedule(job.schedule, 'schedule:job', { job })
 })

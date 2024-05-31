@@ -41,7 +41,7 @@ export default class JobsController {
 
     const job = await Job.create(payload)
 
-    emitter.emit('Job:Created', job)
+    emitter.emit('job:created', job)
 
     return response.created({ data: { job } })
   }
