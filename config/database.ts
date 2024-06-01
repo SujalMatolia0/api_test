@@ -12,7 +12,7 @@ const dbConfig = defineConfig({
         user: env.get('DB_USER'),
         password: env.get('DB_PASSWORD'),
         database: env.get('DB_DATABASE'),
-        ssl: {},
+        ssl: env.get('DB_SSL') ? {} : undefined,
       },
       migrations: {
         naturalSort: true,

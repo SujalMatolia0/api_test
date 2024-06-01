@@ -18,7 +18,9 @@ export default class AgendaProvider {
    * The application has been booted
    */
   async start() {
-    await agenda.start()
+    if (this.app.getEnvironment() === 'web') {
+      await agenda.start()
+    }
   }
 
   /**
